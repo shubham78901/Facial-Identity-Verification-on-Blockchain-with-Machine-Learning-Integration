@@ -111,7 +111,7 @@ async def get_name(file: UploadFile = File(...)):
             "id": "null"
         }
         print(result['distances'][0][0])
-        if result['distances'][0][0] <= 0.2:
+        if result['distances'][0][0] <= 0.35:
             res["name"] = result['metadatas'][0][0]['name']
             res["hexImage"] = result['documents'][0][0]
             res["id"] = result['ids'][0][0]
