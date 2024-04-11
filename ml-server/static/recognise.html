@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Photo Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #response {
+            max-width: 640px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #name,
+        #id {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #imageContainer {
+            margin-top: 20px;
+        }
+
+        #imageContainer img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #captureButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #45a050;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #captureButton:hover {
+            background-color: #45a050;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #45a050;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: ##45a050;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container .button {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="button-container">
+        <button class="button" onclick="redirectToHome()">Home</button>
+        <button class="button" onclick="redirectToUpload()">Upload</button>
+    </div>
+    <h1>Camera Photo Upload</h1>
+
+    <div id="response">
+        <p id="name"></p>
+        <p id="id"></p>
+        <div id="imageContainer"></div>
+    </div>
+
+    <button id="captureButton">Capture Photo</button>
+    <video id="videoElement" width="640" height="480" autoplay></video>
+
+    <script>
+        const captureButton = document.getElementById('captureButton');
+        const videoElement = document.getElementById('videoElement');
+        const nameElement = document.getElementById('name');
+        const idElement = document.getElementById('id');
+        const imageContainer = document.getElementById('imageContainer');
+
+        // Start the video stream when the page loads
+        window.addEventListener('load', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+                videoElement.srcObject = stream;
+                videoElement.play();
+            } catch (error) {
+                console.error('Error starting video stream:', error);
+            }
+        });
+
+        captureButton.addEventListener('click', async () => {
+            try {
+                // Pause the video stream
+                videoElement.pause();
+
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                const imageData = canvas.toDataURL('image/jpeg');
+
+                const blob = await fetch(imageData).then(res => res.blob());
+
+                const formData = new FormData();
+                formData.append('file', blob, 'image.jpg');
+
+                const response = await fetch('/getName', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Display the name and ID
+                nameElement.textContent = `Name: ${data.name}`;
+                idElement.textContent = `ID: ${data.id}`;
+
+                if (data.hexImage !== "null") {
+                    convertAndDisplay(data.hexImage);
+                }
+
+                // Clear previous image and text if any
+                imageContainer.innerHTML = '';
+
+                // Resume the video stream
+                videoElement.play();
+            } catch (error) {
+                console.error('Error capturing photo:', error);
+            }
+        });
+
+        function convertAndDisplay(hexString) {
+            let cleanedHex = hexString.replace(/[^A-Fa-f0-9]/g, "");
+            if (cleanedHex.length % 2) {
+                console.log("Cleaned hex string length is odd.");
+                return;
+            }
+
+            let binary = new Array();
+            for (let i = 0; i < cleanedHex.length / 2; i++) {
+                let h = cleanedHex.substr(i * 2, 2);
+                binary[i] = parseInt(h, 16);
+            }
+
+            let byteArray = new Uint8Array(binary);
+            let blob = new Blob([byteArray], { type: 'image/jpeg' });
+            let blobUrl = URL.createObjectURL(blob);
+
+            // Create img element and display the image
+            let imgElement = document.createElement('img');
+            imgElement.src = blobUrl;
+            imgElement.alt = 'Converted Image';
+
+            // Append img element to the image container
+            imageContainer.appendChild(imgElement);
+        }
+
+        function redirectToHome() {
+            window.location.href = "/";
+        }
+
+        function redirectToUpload() {
+            window.location.href = "/upload";
+        }
+    </script>
+</body>
+
+</html>
