@@ -9,6 +9,10 @@ import chromadb
 import uvicorn
 import uuid
 
+
+from fastapi.responses import JSONResponse  # Import JSONResponse
+
+import aiohttp 
 app = FastAPI()
 db = chromadb.PersistentClient(path="dbFile")
 try:
@@ -35,9 +39,8 @@ async def root():
 @app.post("/storeImage")
 async def store_image(request: Request, file: UploadFile = File(...)):
     # Read the uploaded image
-
     form_data = await request.form()
-    name = str(form_data.get("name"))
+    name = form_data.get("name")
 
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
@@ -55,19 +58,31 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     # Encode the image using MobileNetV2
     image_vector = encode_image(transformed_image)
 
-    # Store the image vector and name in Chroma DB
-    new_id = uuid.uuid4()
+    # Generate a new UUID
+    new_id = str(uuid.uuid4())
+    nftHolderName = name
+    vectorOfCosine = name
 
-    # Convert the ID to a string
-    id_str = str(new_id)
+    # Get the transaction ID after minting NFT
+    txid = await getTxidAfterMintingNft(nftHolderName, vectorOfCosine, file)
+    
+    print("txid in main",txid)
+
+    # Ensure txid is not None
+    if txid is None:
+        txid = ""
+
+    # Add the image data to the Chroma DB collection
     collection.add(
-    documents=[hex_string],
-    embeddings=[image_vector.tolist()],
-    metadatas=[{"name": name}],
-    ids=[id_str]
+        documents=[hex_string],
+        embeddings=[image_vector.tolist()],
+        metadatas=[{"name": name, "txid": str(txid), "currenttxid": str(txid) }],  # Ensure txid is not None
+        ids=[new_id]
     )
 
-    return {"message": "Image stored successfully"}
+    # Return the response with relevant data
+    print(JSONResponse(content={"result": "Success!", "txid": str(txid)}))
+    return JSONResponse(content={"result": "Success!", "txid": str(txid)})
 
 @app.post("/getName")
 async def get_name(file: UploadFile = File(...)):
@@ -120,6 +135,34 @@ def encode_image(transformed_image):
     with torch.no_grad():
         features = model(transformed_image)
     return features.squeeze().numpy()
+
+async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, image):
+    print("inside api calling")
+    try:
+        async with aiohttp.ClientSession() as session:
+            form_data = aiohttp.FormData()
+            form_data.add_field('nftHolderName', nftHolderName)
+            form_data.add_field('vectorOfCosine', vectorOfCosine)
+            form_data.add_field('file', image.file, filename=image.filename, content_type='image/jpeg')
+
+            async with session.post('http://localhost:5000/custom/mint', data=form_data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    mint_result = data.get('mintResult', None)
+                    if isinstance(mint_result, dict):
+                        mint_result = mint_result.get('mintResult')
+                    print("in calling func a data", data)
+                    print("in calling func", mint_result)
+                    return mint_result
+                else:
+                    print("Error in minting NFT:", await response.text())
+                    return None
+    except Exception as e:
+        print(f"Error in minting NFT: {e}")
+        return None
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
