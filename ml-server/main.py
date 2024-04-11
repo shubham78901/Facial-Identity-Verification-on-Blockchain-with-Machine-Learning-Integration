@@ -143,7 +143,7 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, image):
             form_data = aiohttp.FormData()
             form_data.add_field('nftHolderName', nftHolderName)
             form_data.add_field('vectorOfCosine', vectorOfCosine)
-            form_data.add_field('file', file, filename=file.filename, content_type='image/jpeg')
+            form_data.add_field('file', image.file, filename=image.filename, content_type='image/jpeg')
 
             async with session.post('http://13.202.14.28:5000/custom/mint', data=form_data) as response:
                 if response.status == 200:
@@ -160,6 +160,7 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, image):
     except Exception as e:
         print(f"Error in minting NFT: {e}")
         return None
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
