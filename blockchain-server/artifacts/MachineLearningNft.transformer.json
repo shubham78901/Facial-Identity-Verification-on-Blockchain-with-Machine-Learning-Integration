@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "MachineLearningNft.scrypt",
+  "sourceMapFile": "MachineLearningNft.scrypt.map",
+  "ctxMethods": [
+    "registerResultAfterFaceMatch"
+  ]
+}

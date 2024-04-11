@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  blockchain-server:
+    build: ./blockchain-server
+    ports:
+      - "5000:5000"
+
+  ml-server:
+    build: ./ml-server
+    ports:
+      - "8000:8000"

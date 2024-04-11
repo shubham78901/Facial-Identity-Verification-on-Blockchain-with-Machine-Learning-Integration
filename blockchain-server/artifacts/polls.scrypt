@@ -1,0 +1,65 @@
+import "node_modules/scrypt-ord/src/contracts/ordinal.scrypt";
+
+contract Polls {
+  @state bool isOneSatNFT;
+  bytes betName;
+  bytes betDetail;
+  @state bytes winnerOption;
+  bytes organiserCompany;
+  bytes optionA;
+  bytes optionB;
+  int betAmountPerPerson;
+  int betAmountTotal;
+  @state HashedMap<bytes,bytes> OptionsvsPublicKey;
+  VarIntReader __scrypt_ts_accessPathReaderForProp__OptionsvsPublicKey;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_value;
+  constructor(bytes betName, bytes betDetail, bytes winnerOption, bytes organiserCompany, bytes optionA, bytes optionB, int betAmountTotal, HashedMap<bytes,bytes> optionVsPublicKey, int betAmountPerPerson) {
+    this.isOneSatNFT = true;
+    
+    this.betName = betName;
+    this.betDetail = betDetail;
+    this.winnerOption = winnerOption;
+    this.organiserCompany = organiserCompany;
+    this.optionA = optionA;
+    this.optionB = optionB;
+    this.betAmountTotal = betAmountTotal;
+    this.OptionsvsPublicKey = optionVsPublicKey;
+    this.betAmountPerPerson = betAmountPerPerson;
+  }
+  function buildStateOutputNFT() : bytes {
+    bytes stateScript = Ordinal.removeInsciption(this.getStateScript());
+    return Utils.buildOutput(stateScript, 1);
+  }
+  static function buildInscribedOutput(bytes script, bytes content, bytes contentType) : bytes {
+    bytes part1 = Ordinal.createInsciption(content, contentType);
+    bytes part2 = Ordinal.removeInsciption(script);
+    return Utils.buildOutput(part1 + part2, 1);
+  }
+  public function entryNewBet(bytes OptionsName, bytes publicKey, SigHashPreimage __scrypt_ts_txPreimage, bytes __scrypt_ts_accessPathForProp__OptionsvsPublicKey) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_accessPathReaderForProp__OptionsvsPublicKey = new VarIntReader(__scrypt_ts_accessPathForProp__OptionsvsPublicKey);
+    require(this.OptionsvsPublicKey.set({publicKey, this.__scrypt_ts_accessPathReaderForProp__OptionsvsPublicKey.readInt()}, OptionsName));
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(this.buildStateOutput(this.__scrypt_ts_ctx_value)));
+  }
+  public function anounceResultAndDistributeMoney(bytes OptionsName, Sig organizationSig, PubKey organizationPubkey, PubKey[1000] pubKeysbetter, SigHashPreimage __scrypt_ts_txPreimage, bytes __scrypt_ts_accessPathForProp__OptionsvsPublicKey) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_accessPathReaderForProp__OptionsvsPublicKey = new VarIntReader(__scrypt_ts_accessPathForProp__OptionsvsPublicKey);
+    this.winnerOption = OptionsName;
+    require(checkSig(organizationSig, organizationPubkey));
+    loop (1000) : i {
+        if(pubKeysbetter[i] != b'') {
+          require(this.OptionsvsPublicKey.canGet({pubKeysbetter[i], this.__scrypt_ts_accessPathReaderForProp__OptionsvsPublicKey.readInt()}, this.winnerOption));
+        }
+      }
+    int amount = this.__scrypt_ts_ctx_value;
+    bytes output = this.buildStateOutput(amount);
+    
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(this.buildStateOutput(this.__scrypt_ts_ctx_value)));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+}

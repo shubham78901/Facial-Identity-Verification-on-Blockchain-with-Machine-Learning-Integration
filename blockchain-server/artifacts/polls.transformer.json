@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "polls.scrypt",
+  "sourceMapFile": "polls.scrypt.map",
+  "ctxMethods": [
+    "entryNewBet",
+    "anounceResultAndDistributeMoney"
+  ]
+}

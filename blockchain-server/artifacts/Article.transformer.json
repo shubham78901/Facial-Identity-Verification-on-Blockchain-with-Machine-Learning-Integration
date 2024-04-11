@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "Article.scrypt",
+  "sourceMapFile": "Article.scrypt.map",
+  "ctxMethods": [
+    "like",
+    "share"
+  ]
+}

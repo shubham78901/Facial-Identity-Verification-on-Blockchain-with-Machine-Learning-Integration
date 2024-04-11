@@ -1,0 +1,42 @@
+import "node_modules/scrypt-ord/src/contracts/ordinal.scrypt";
+
+contract Adevertisement {
+  @state bool isOneSatNFT;
+  @state HashedMap<int,bytes> commentMap;
+  VarIntReader __scrypt_ts_accessPathReaderForProp__commentMap;
+  bytes articalAuthor;
+  int shareReward;
+  int likeReward;
+  bytes publishdate;
+  bytes category;
+  bytes heading;
+  bytes subheading;
+  int commentReward;
+  bytes content;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_value;
+  constructor(int shareReward, int likeReward, int commentReward, bytes articalAuthor, bytes content, bytes subheading, bytes heading, bytes publishdate) {
+  }
+  function buildStateOutputNFT() : bytes {
+    bytes stateScript = Ordinal.removeInsciption(this.getStateScript());
+    return Utils.buildOutput(stateScript, 1);
+  }
+  static function buildInscribedOutput(bytes script, bytes content, bytes contentType) : bytes {
+    bytes part1 = Ordinal.createInsciption(content, contentType);
+    bytes part2 = Ordinal.removeInsciption(script);
+    return Utils.buildOutput(part1 + part2, 1);
+  }
+  public function Like(bytes publicKeyLiker, Sig advertiserSig, PubKey advertiserPubkey) {
+  }
+  public function Share(bytes publicKeyLiker, Sig advertiserSig, PubKey advertiserPubkey) {
+  }
+  public function Comment(bytes commentContent, int commmentKey, SigHashPreimage __scrypt_ts_txPreimage, bytes __scrypt_ts_accessPathForProp__commentMap) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_accessPathReaderForProp__commentMap = new VarIntReader(__scrypt_ts_accessPathForProp__commentMap);
+    require(this.commentMap.set({commmentKey, this.__scrypt_ts_accessPathReaderForProp__commentMap.readInt()}, commentContent));
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(this.buildStateOutput(this.__scrypt_ts_ctx_value)));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+}

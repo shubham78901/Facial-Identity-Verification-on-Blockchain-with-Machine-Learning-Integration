@@ -1,0 +1,52 @@
+{
+  "success": false,
+  "errors": [
+    {
+      "message": "property `commentMap` must be initialized in the constructor",
+      "srcRange": {
+        "fileName": "D:/Desktop/fun/src/contracts/advertisement.ts",
+        "start": {
+          "line": 41,
+          "character": 5
+        },
+        "end": {
+          "line": 42,
+          "character": 48
+        }
+      }
+    },
+    {
+      "message": "Untransformable public method: Public method `Like` not ended with `assert()`",
+      "srcRange": {
+        "fileName": "D:/Desktop/fun/src/contracts/advertisement.ts",
+        "start": {
+          "line": 93,
+          "character": 5
+        },
+        "end": {
+          "line": 102,
+          "character": 6
+        }
+      }
+    },
+    {
+      "message": "Untransformable public method: Public method `Share` not ended with `assert()`",
+      "srcRange": {
+        "fileName": "D:/Desktop/fun/src/contracts/advertisement.ts",
+        "start": {
+          "line": 105,
+          "character": 5
+        },
+        "end": {
+          "line": 114,
+          "character": 6
+        }
+      }
+    }
+  ],
+  "scryptfile": "advertisement.scrypt",
+  "sourceMapFile": "advertisement.scrypt.map",
+  "ctxMethods": [
+    "Comment"
+  ]
+}

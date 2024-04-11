@@ -13,8 +13,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Set environment variable to increase heap memory
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 RUN npx scrypt-cli@latest compile
 
