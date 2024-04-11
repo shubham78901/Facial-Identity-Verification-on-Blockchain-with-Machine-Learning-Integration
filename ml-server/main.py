@@ -45,6 +45,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    filetype=file.content_type
 
     _, buffer = cv2.imencode('.jpg', image)
     byte_array = buffer.tobytes()
@@ -64,7 +65,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     vectorOfCosine = name
 
     # Get the transaction ID after minting NFT
-    txid = await getTxidAfterMintingNft(nftHolderName, vectorOfCosine, file)
+    txid = await getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string,filetype)
     
     print("txid in main",txid)
 
@@ -136,16 +137,18 @@ def encode_image(transformed_image):
         features = model(transformed_image)
     return features.squeeze().numpy()
 
-async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, image):
+
+async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, filetype):
     print("inside api calling")
     try:
         async with aiohttp.ClientSession() as session:
-            form_data = aiohttp.FormData()
-            form_data.add_field('nftHolderName', nftHolderName)
-            form_data.add_field('vectorOfCosine', vectorOfCosine)
-            form_data.add_field('file', image.file, filename=image.filename, content_type='image/jpeg')
-
-            async with session.post('http://13.202.14.28:5000/custom/mint', data=form_data) as response:
+            data = {
+                'nftHolderName': nftHolderName,
+                'vectorOfCosine': vectorOfCosine,
+                'hex_string': hex_string,
+                'fileType': filetype
+            }
+            async with session.post('http://localhost:5000/custom/mint', json=data) as response:
                 if response.status == 200:
                     data = await response.json()
                     mint_result = data.get('mintResult', None)
