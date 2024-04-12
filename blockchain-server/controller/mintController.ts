@@ -40,7 +40,7 @@ router.post('/mint', upload.single('file'), async function (req, res) {
          
         )
 
-        console.log(`Publish successful. Token ID: ${mintResult}`)
+      
 
 
         res.json({
