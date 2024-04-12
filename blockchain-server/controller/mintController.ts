@@ -18,14 +18,14 @@ router.post('/mint', upload.single('file'), async function (req, res) {
   
 
     
-console.log(req.body)
+// console.log(req.body)
     try {
         console.log(
             'Received minting request with TokenSupply:',
             nftHolderName,
             vectorOfCosine,
         
-            hex_string
+            // hex_string
            
         )
         
