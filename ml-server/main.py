@@ -74,10 +74,12 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     id_str = str(new_id)
     
     # Assuming collection and its methods are defined elsewhere
+    listOfTxid=[]
+    listOfTxid.append(txid)
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "txid": str(txid), "currenttxid": str(txid) }],  # Ensure txid is not None
+        metadatas=[{"name": name, "txid": listOfTxid }],  # Ensure txid is not None
         ids=[id_str]
     )
 
