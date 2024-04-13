@@ -1,9 +1,9 @@
 
 
-import { DefaultProvider, bsv, toByteString } from 'scrypt-ts';
+import { toByteString } from 'scrypt-ts';
 import { MachineLearningNft } from '../src/contracts/MachineLearningNft';
-import { NeucronSigner } from 'neucron-signer';
 
+import { getDefaultSigner } from '../tests/utils/txHelper';
 
 
 
@@ -24,15 +24,10 @@ export async function Mint(
     await MachineLearningNft.loadArtifact('./artifacts/MachineLearningNft.json');
 
     // Create and login with NeucronSigner
-    const nec_signer = await new NeucronSigner(
-        new DefaultProvider({
-            network: bsv.Networks.mainnet,
-        })
-    );
-    await nec_signer.login('ss363757@gmail.com', 'Shubham123');
+
 
     // Create instance of MachineLearningNft contract
-    const faceMatchResult = "ust got inscribed and nft-identity holder name is!"+nftHolderName;
+    const faceMatchResult = "Image just got loaded!";
     const instance = new MachineLearningNft(
         toByteString(nftHolderName, true),
         toByteString(vectorOfCosine, true),
@@ -40,7 +35,7 @@ export async function Mint(
     );
 
     // Connect to contract instance
-    await instance.connect(nec_signer);
+    await instance.connect(getDefaultSigner());
 
     // Get MIME type from filename
     

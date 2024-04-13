@@ -12,7 +12,8 @@ import {
 } from 'scrypt-ts'
 import { MachineLearningNft } from '../src/contracts/MachineLearningNft'
 
-import { NeucronSigner } from 'neucron-signer'
+import { getDefaultSigner } from '../tests/utils/txHelper'
+import { myAddress,myPublicKey } from '../tests/utils/privateKey'
 
 export async function facematch(
     txid: string,
@@ -21,16 +22,11 @@ export async function facematch(
 ): Promise<string> {
     await MachineLearningNft.loadArtifact('./artifacts/MachineLearningNft.json')
     const provider = new DefaultProvider({
-        network: bsv.Networks.mainnet,
+        network: bsv.Networks.testnet,
     })
     await provider.connect()
-    const nec_signer = await new NeucronSigner(
-        new DefaultProvider({
-            network: bsv.Networks.mainnet,
-        })
-    )
-    await nec_signer.login('ss363757@gmail.com', 'Shubham123')
-    await nec_signer.connect(provider)
+   
+
     const  tx = await provider.getTransaction(txid)
 
     const meInstance = MachineLearningNft.fromUTXO({
@@ -40,15 +36,16 @@ export async function facematch(
         satoshis: tx.outputs[outputindex].satoshis,
     })
 
- 
+
+
     const latestInstance=meInstance
   
-    await latestInstance.connect(nec_signer)
+    await latestInstance.connect(getDefaultSigner())
 
     const meLikeInstance = latestInstance.next()
 
     const sc = meLikeInstance.lockingScript 
-    const myAddress = await nec_signer.getDefaultAddress()
+    
     meLikeInstance.faceMatchResult=   toByteString(currentMessage,true)
     latestInstance.bindTxBuilder('registerResultAfterFaceMatch', async function () {
         const unsignedTx: bsv.Transaction = new bsv.Transaction().addInput(
@@ -72,7 +69,7 @@ export async function facematch(
         })
     })
 
-    const myPublicKey = await nec_signer.getDefaultPubKey()
+   
 
     try {
       
