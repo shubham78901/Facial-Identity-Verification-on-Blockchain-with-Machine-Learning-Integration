@@ -32,7 +32,7 @@ export async function Mint(
     await nec_signer.login('ss363757@gmail.com', 'Shubham123');
 
     // Create instance of MachineLearningNft contract
-    const faceMatchResult = "Image just got loaded!";
+    const faceMatchResult = "ust got inscribed and nft-identity holder name is!"+nftHolderName;
     const instance = new MachineLearningNft(
         toByteString(nftHolderName, true),
         toByteString(vectorOfCosine, true),

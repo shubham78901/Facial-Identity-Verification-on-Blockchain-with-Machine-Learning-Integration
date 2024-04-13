@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, File, UploadFile,Request,HTTPException
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, Request
@@ -74,21 +75,26 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     id_str = str(new_id)
     
     # Assuming collection and its methods are defined elsewhere
-    listOfTxid=[]
-    listOfTxid.append(txid)
+    # Create a list containing the deploytxid
+    listOfTxid = txid
+
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "txid": listOfTxid }],  # Ensure txid is not None
+        metadatas=[{"name": name, "txid": listOfTxid}],  # Ensure txid is not None
         ids=[id_str]
     )
-
+      
 
 
     # Return the response with relevant data
     response_data = {"result": "Success!", "txid": str(txid)}
     print("response_data",response_data)
     return JSONResponse(content=response_data)
+# Add this line to configure logging
+logging.basicConfig(level=logging.INFO)
+
+import logging
 
 @app.post("/getName")
 async def get_name(file: UploadFile = File(...)):
@@ -110,24 +116,48 @@ async def get_name(file: UploadFile = File(...)):
             query_embeddings=[image_vector.tolist()],
             n_results=1
         )
-        return result
+
         res = {
             "name": "Not Found",
             "hexImage": "null",
             "id": "null"
         }
-        print(result['distances'][0][0])
+
+        logging.info(result['distances'][0][0])
         if result['distances'][0][0] <= 0.1:
+          #  currentMatchcount = len(result['metadatas'][0])
+            #logging.info("currentMatchcount: %s", currentMatchcount)
+            
+         #   lastTxid = result['metadatas'][0][currentMatchcount - 1]["txid"]
+           # logging.info("lastTxid: %s", lastTxid)
+
+         #   messageToBeBroadcastAfterUnlockingNft = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person. Nft-identity, deployTxid: {result['metadatas'][0][0]['txid']} and number of times it has appeared is: {currentMatchcount}"
+            # latestTxid = await call_facematch_endpoint(lastTxid, 0, messageToBeBroadcastAfterUnlockingNft)
+            latestTxid=""
+            logging.info("latestTxid: %s", latestTxid)
+
             res["name"] = result['metadatas'][0][0]['name']
+            #currentMatchcount += 1
+            new_metadata = {"currentMatchCount": currentMatchcount, "txid": latestTxid}
+           
+          
+            # Update the collection with the new metadata
+            print("result['ids'][0][0]",result['ids'][0][0])
+            collection.update(
+                {"_id": result['ids'][0][0]},  
+                {"$push": {"metadatas": new_metadata}}
+            )
+            
             res["hexImage"] = result['documents'][0][0]
             res["id"] = result['ids'][0][0]
 
         return res
     except Exception as e:
         # Log the error for debugging
-        print(f"Error processing image: {e}")
+        logging.error(f"Error processing image: {e}")
         # Raise a more detailed HTTPException
         raise HTTPException(status_code=422, detail="Error processing image")
+
     
 # def preprocess_image(image):
 #     transform = transforms.Compose([
@@ -177,6 +207,33 @@ def encode_image(img):
         # Handle any errors that might occur during encoding
         print(f"Error encoding image: {e}")
         return None
+    
+
+import requests
+
+async def call_facematch_endpoint(txid, outputindex, currentMessage):
+    print("inside call face math function")
+    url = "http://localhost:5000/custom/facematch"  # Replace with the actual URL of your Express server
+    data = {
+        "txid": txid,
+        "outputindex": outputindex,
+        "currentMessage": currentMessage
+    }
+    try:
+        response = requests.post(url, json=data)
+        response_data = response.json()
+        if response_data.get("success"):
+            return response_data.get("result")
+        else:
+            print("Error:", response_data.get("error"))
+            return None
+    except Exception as e:
+        print("Exception:", e)
+        return None
+
+# Example usage
+
+    
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
