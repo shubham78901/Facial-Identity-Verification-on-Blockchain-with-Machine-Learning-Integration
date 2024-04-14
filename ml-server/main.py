@@ -158,7 +158,7 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, file
                 'hex_string': hex_string,
                 'fileType': filetype
             }
-            async with session.post('http://13.202.14.28:5000/custom/mint', json=data) as response:
+            async with session.post('http://localhost:5000/custom/mint', json=data) as response:
                 if response.status == 200:
                     data = await response.json()
                     mint_result = data.get('mintResult', None)
