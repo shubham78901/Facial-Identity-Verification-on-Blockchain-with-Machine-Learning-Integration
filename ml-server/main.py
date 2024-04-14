@@ -77,7 +77,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "txid": str(txid), "currenttxid": str(txid) }],  # Ensure txid is not None
+        metadatas=[{"name": name, "txid": str(txid) }],  # Ensure txid is not None
         ids=[id_str]
     )
 
@@ -98,7 +98,7 @@ async def get_name(file: UploadFile = File(...)):
 
         # Preprocess the image
         # transformed_image = preprocess_image(image)
-        transformed_image=image
+        transformed_image = image
 
         # Encode the image using MobileNetV2
         image_vector = encode_image(transformed_image)
@@ -108,7 +108,7 @@ async def get_name(file: UploadFile = File(...)):
             query_embeddings=[image_vector.tolist()],
             n_results=1
         )
-        return result
+
         res = {
             "name": "Not Found",
             "hexImage": "null",
@@ -116,6 +116,16 @@ async def get_name(file: UploadFile = File(...)):
         }
         print(result['distances'][0][0])
         if result['distances'][0][0] <= 0.1:
+            # Assuming you have the latestTxid
+            new_metadata = {"currentMatchCount": 1, "txid": "latestTxid"}
+
+            # Update the collection with the new metadata using `$push`
+            collection.update(
+                {"_id": result['ids'][0][0]},
+                {"$push": {"metadatas": new_metadata}}
+            )
+
+            # Update response dictionary after successful update
             res["name"] = result['metadatas'][0][0]['name']
             res["hexImage"] = result['documents'][0][0]
             res["id"] = result['ids'][0][0]
@@ -126,6 +136,7 @@ async def get_name(file: UploadFile = File(...)):
         print(f"Error processing image: {e}")
         # Raise a more detailed HTTPException
         raise HTTPException(status_code=422, detail="Error processing image")
+
     
 # def preprocess_image(image):
 #     transform = transforms.Compose([
@@ -162,6 +173,30 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, file
     except Exception as e:
         print(f"Error in minting NFT: {e}")
         return None
+
+
+
+
+async def call_facematch_endpoint(txid, outputindex, currentMessage):
+    print("inside call face math function")
+    url = "http://13.202.14.28:5000/custom/facematch"  # Replace with the actual URL of your Express server
+    data = {
+        "txid": txid,
+        "outputindex": outputindex,
+        "currentMessage": currentMessage
+    }
+    try:
+        response = requests.post(url, json=data)
+        response_data = response.json()
+        if response_data.get("success"):
+            return response_data.get("result")
+        else:
+            print("Error:", response_data.get("error"))
+            return None
+    except Exception as e:
+        print("Exception:", e)
+        return None
+
 
 def encode_image(img):
     try:
