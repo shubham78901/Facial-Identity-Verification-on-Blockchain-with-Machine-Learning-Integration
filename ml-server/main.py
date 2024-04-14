@@ -117,13 +117,13 @@ async def get_name(file: UploadFile = File(...)):
         print(result['distances'][0][0])
         if result['distances'][0][0] <= 0.1:
             # Assuming you have the latestTxid
-            new_metadata = {"currentMatchCount": 1, "txid": "latestTxid"}
+            # new_metadata = {"currentMatchCount": 1, "txid": "latestTxid"}
 
-            # Update the collection with the new metadata using `$push`
-            collection.update(
-                {"_id": result['ids'][0][0]},
-                {"$push": {"metadatas": new_metadata}}
-            )
+            # # Update the collection with the new metadata using `$push`
+            # collection.update(
+            #     {"_id": result['ids'][0][0]},
+            #     {"$push": {"metadatas": new_metadata}}
+            # )
 
             # Update response dictionary after successful update
             res["name"] = result['metadatas'][0][0]['name']
