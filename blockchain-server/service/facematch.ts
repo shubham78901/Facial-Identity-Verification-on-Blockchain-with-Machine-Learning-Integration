@@ -20,6 +20,7 @@ export async function facematch(
     outputindex: number,
     currentMessage:string,
 ): Promise<string> {
+    console.log(currentMessage)
     await MachineLearningNft.loadArtifact('./artifacts/MachineLearningNft.json')
     const provider = new DefaultProvider({
         network: bsv.Networks.testnet,
@@ -38,20 +39,21 @@ export async function facematch(
 
 
 
-    const latestInstance=meInstance
+   
   
-    await latestInstance.connect(getDefaultSigner())
+    await meInstance.connect(getDefaultSigner())
 
-    const meLikeInstance = latestInstance.next()
+    const meLikeInstance = meInstance.next()
 
     const sc = meLikeInstance.lockingScript 
     
     meLikeInstance.faceMatchResult= toByteString(currentMessage,true)
     meLikeInstance.faceMatchCount=meLikeInstance.faceMatchCount+BigInt(1)
-    latestInstance.bindTxBuilder('registerResultAfterFaceMatch', async function () {
+    meInstance.bindTxBuilder('registerResultAfterFaceMatch', async function () {
         const unsignedTx: bsv.Transaction = new bsv.Transaction().addInput(
             meInstance.buildContractInput()
         )
+      
 
         unsignedTx
             .addOutput(
@@ -75,7 +77,7 @@ export async function facematch(
     try {
       
 
-        const { tx: likeTx } = await latestInstance.methods.registerResultAfterFaceMatch(
+        const { tx: likeTx } = await meInstance.methods.registerResultAfterFaceMatch(
             (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),
             PubKey(toHex(myPublicKey)),
             {

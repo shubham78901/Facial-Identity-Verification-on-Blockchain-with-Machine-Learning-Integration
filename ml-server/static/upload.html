@@ -1,173 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mint personalized tokens by inscribing your unique face!</title>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Photo Upload</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #FFFFE0;
+        }
 
-      .header {
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        padding: 10px 0;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        /* z-index: 1000; */
-      }
+        h1 {
+            margin-bottom: 20px;
+        }
 
-      .container {
-        margin-top: 40px;
-        /* Adjust top margin based on header height */
-        padding: 20px;
-        text-align: center;
-      }
+        #response {
+            max-width: 640px;
+            background-color: ##FFFFE0;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-      .button {
-        display: block;
-        margin: 0 auto 10px;
-        width: 50%;
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+        #name,
+        #id {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
 
-      .button:hover {
-        background-color: #45a049;
-      }
+        #imageContainer {
+            margin-top: 20px;
+        }
 
-      form {
-        max-width: 400px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+        #imageContainer img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
 
-      label {
-        display: block;
-        margin-bottom: 10px;
-      }
+        #captureButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #45a050;
+            color: ##FFFFE0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-      input[type="file"],
-      input[type="text"],
-      input[type="button"] {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-      }
+        #captureButton:hover {
+            background-color: #B8860B;
+        }
 
-      #result {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color:  #B8860B;
+            color: #FFFFE0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-      .button-container {
-        margin-top: 120px;
-        margin-bottom: 0px;
-        display: flex;
-        justify-content: center;
-      }
+        .button:hover {
+            background-color:  #B8860B;
+        }
 
-      .button-container .button {
-        margin: 0 10px;
-      }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container .button {
+            margin: 0 10px;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
-    <div class="header">
-      <h1>Mint personalized tokens by inscribing your unique face!</h1>
-    </div>
+<body>
+
     <div class="button-container">
-      <button class="button" onclick="redirectToHome()">Home</button>
-      <button class="button" onclick="redirectToRecognize()">Recognize</button>
+        <button class="button" onclick="redirectToHome()">Home</button>
+        <button class="button" onclick="redirectToUpload()">Upload</button>
     </div>
-    <div class="container">
-      <div id="uploadWithNameForm">
-        <h2>Upload Image and Name</h2>
-        <form enctype="multipart/form-data">
-          <label for="image">Select Image:</label>
-          <input
-            type="file"
-            id="image"
-            name="file"
-            accept="image/*"
-            required
-          /><br />
-          <label for="name">Person's Name:</label>
-          <input type="text" id="name" name="name" required /><br />
-          <input
-            type="button"
-            class="button"
-            value="Upload Image and Name"
-            onclick="uploadWithName()"
-          />
-        </form>
-      </div>
+    <h1>Camera Photo Upload</h1>
 
-      <!-- Result display -->
-      <div id="result"></div>
-      <div id="txid"></div>
-      <div id="uploadedwoctxid"></div>
+    <div id="response">
+        <p id="youappeared"></p>
+        <p id="name"></p>
+        <p id="Txid"></p>
+        <p id="viewonwoc"></p>
+        <p id="id"></p>
+        <div id="imageContainer"></div>
     </div>
+
+    <button id="captureButton">Capture Photo</button>
+    <video id="videoElement" width="640" height="480" autoplay></video>
 
     <script>
-      function showUploadWithNameForm() {
-        document.getElementById("result").innerText = "";
-      }
-      async function uploadWithName() {
-        const form = document
-          .getElementById("uploadWithNameForm")
-          .querySelector("form");
-        const formData = new FormData(form);
+        const captureButton = document.getElementById('captureButton');
+        const videoElement = document.getElementById('videoElement');
+        const nameElement = document.getElementById('name');
+        const idElement = document.getElementById('id');
+        const imageContainer = document.getElementById('imageContainer');
+        const viewonwocContainer = document.getElementById('viewonwoc');
+        const txidcontainer = document.getElementById('Txid');
+        const youappearedContainer = document.getElementById('youappeared');
 
-        const response = await fetch("/storeImage", {
-          method: "POST",
-          body: formData,
+        // Start the video stream when the page loads
+        window.addEventListener('load', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+                videoElement.srcObject = stream;
+                videoElement.play();
+            } catch (error) {
+                console.error('Error starting video stream:', error);
+            }
         });
 
-        const result = await response.json();
-        console.log("result", result);
-        if (response.ok) {
-          document.getElementById("result").innerText = "Success!";
-          const mintResult = result.txid// Access the mintResult property directly
-          document.getElementById("txid").innerText = "TxId: " + mintResult;
-          console.log("mintResult frontend",mintResult)
-          document.getElementById(
-            "uploadedwoctxid"
-          ).innerHTML = `<a href="https://test.whatsonchain.com/tx/${mintResult}" target="_blank">View on Whatsonchain</a>`; // Create link to mintResult
-        } else {
-          document.getElementById("result").innerText = "Error occurred!";
+        captureButton.addEventListener('click', async () => {
+            try {
+                // Pause the video stream
+                videoElement.pause();
+
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                const imageData = canvas.toDataURL('image/jpeg');
+
+                const blob = await fetch(imageData).then(res => res.blob());
+
+                const formData = new FormData();
+                formData.append('file', blob, 'image.jpg');
+
+                const response = await fetch('/getName', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Display the name and ID
+                nameElement.textContent = `Name: ${data.name}`;
+                idElement.textContent = `ID: ${data.id}`;
+                youappearedContainer.textContent = `You appeared ${data.count} times`;
+                txidcontainer.textContent = `Txid: ${data.txid}`;
+                viewonwocContainer.innerHTML = `<a href="https://test.whatsonchain.com/tx/${data.txid}" target="_blank">View on Whatsonchain</a>`
+
+
+                if (data.hexImage !== "null") {
+                    convertAndDisplay(data.hexImage);
+                }
+
+                // Clear previous image and text if any
+                imageContainer.innerHTML = '';
+
+                // Resume the video stream
+                videoElement.play();
+            } catch (error) {
+                console.error('Error capturing photo:', error);
+            }
+        });
+
+        function convertAndDisplay(hexString) {
+            let cleanedHex = hexString.replace(/[^A-Fa-f0-9]/g, "");
+            if (cleanedHex.length % 2) {
+                console.log("Cleaned hex string length is odd.");
+                return;
+            }
+
+            let binary = new Array();
+            for (let i = 0; i < cleanedHex.length / 2; i++) {
+                let h = cleanedHex.substr(i * 2, 2);
+                binary[i] = parseInt(h, 16);
+            }
+
+            let byteArray = new Uint8Array(binary);
+            let blob = new Blob([byteArray], { type: 'image/jpeg' });
+            let blobUrl = URL.createObjectURL(blob);
+
+            // Create img element and display the image
+            let imgElement = document.createElement('img');
+            imgElement.src = blobUrl;
+            imgElement.alt = 'Converted Image';
+
+            // Append img element to the image container
+            imageContainer.appendChild(imgElement);
         }
-      }s
 
-      function redirectToHome() {
-        window.location.href = "/";
-      }
+        function redirectToHome() {
+            window.location.href = "/";
+        }
 
-      function redirectToRecognize() {
-        window.location.href = "/recognise";
-      }
+        function redirectToUpload() {
+            window.location.href = "/upload";
+        }
     </script>
-  </body>
+</body>
+
 </html>

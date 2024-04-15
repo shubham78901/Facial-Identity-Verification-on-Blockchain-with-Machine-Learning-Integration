@@ -2,8 +2,6 @@ from fastapi import FastAPI, File, UploadFile,Request,HTTPException
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import JSONResponse
-from datetime import datetime
-
 import cv2
 import numpy as np
 import aiohttp 
@@ -14,6 +12,9 @@ import chromadb
 import uvicorn
 import uuid
 import face_recognition
+import datetime
+import requests
+
 
 
 app = FastAPI()
@@ -38,6 +39,7 @@ async def root():
 @app.get("/upload")
 async def root():
     return FileResponse("static/upload.html")
+
 
 
 
@@ -79,7 +81,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "deploytxid":str(txid),"facematchcount":0,"currenttxid": str(txid) }],  # Ensure txid is not None
+        metadatas=[{"name": name, "deploytxid": str(txid),"currenttxid":str(txid),"facematchcount":0}],  # Ensure txid is not None
         ids=[id_str]
     )
 
@@ -110,7 +112,8 @@ async def get_name(file: UploadFile = File(...)):
             query_embeddings=[image_vector.tolist()],
             n_results=1
         )
-        current_datetime = datetime.now()
+        current_datetime = datetime.datetime.now()
+
         current_date_string = current_datetime.strftime("%Y-%m-%d")
 
         res = {
@@ -128,7 +131,8 @@ async def get_name(file: UploadFile = File(...)):
             lasttxid=result['metadatas'][0][0]['currenttxid']
             newfacematchcount=result['metadatas'][0][0]['facematchcount']+1
             messageToBeBroadcastAfterUnlockingNft = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person on dated {current_date_string}. Nft-identity, deployTxid: {result['metadatas'][0][0]['deploytxid']} and number of times it has appeared is: {newfacematchcount} ,face"
-            latestTxid = await call_facematch_endpoint(lastTxid, 0, messageToBeBroadcastAfterUnlockingNft)
+            latestTxid = await call_facematch_endpoint(lasttxid, 0, messageToBeBroadcastAfterUnlockingNft)
+            print("latestTxid in func ",latestTxid)
             res["name"] = result['metadatas'][0][0]['name']
             res["hexImage"] = result['documents'][0][0]
             res["txid"]=latestTxid
@@ -190,11 +194,9 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, file
         return None
 
 
-
-
 async def call_facematch_endpoint(txid, outputindex, currentMessage):
-    print("inside call face math function")
-    url = "http://13.202.14.28:5000/custom/facematch"  # Replace with the actual URL of your Express server
+    print("inside call face match function")
+    url = "http://localhost:5000/custom/facematch"  # Replace with the actual URL of your Express server
     data = {
         "txid": txid,
         "outputindex": outputindex,
@@ -204,13 +206,15 @@ async def call_facematch_endpoint(txid, outputindex, currentMessage):
         response = requests.post(url, json=data)
         response_data = response.json()
         if response_data.get("success"):
-            return response_data.get("result")
+            print("response_data.get("")",response_data.get("result"))
+            return response_data.get("result").get('result')
         else:
             print("Error:", response_data.get("error"))
             return None
     except Exception as e:
         print("Exception:", e)
         return None
+
 
 
 def encode_image(img):
