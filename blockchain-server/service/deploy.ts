@@ -31,7 +31,8 @@ export async function Mint(
     const instance = new MachineLearningNft(
         toByteString(nftHolderName, true),
         toByteString(vectorOfCosine, true),
-        toByteString(faceMatchResult, true)
+        toByteString(faceMatchResult, true),
+        BigInt(0)
     );
 
     // Connect to contract instance

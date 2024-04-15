@@ -7,7 +7,7 @@ export async function SendTrainedData(
     outputindex: number
 ): Promise<string> {
     const provider = new DefaultProvider({
-        network: bsv.Networks.mainnet,
+        network: bsv.Networks.testnet,
     })
     await MachineLearningNft.loadArtifact('./artifacts/MachineLearningNft.json')
     console.log('output index /sendfile', outputindex)

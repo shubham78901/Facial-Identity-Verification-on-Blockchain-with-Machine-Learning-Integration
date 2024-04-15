@@ -2,6 +2,8 @@ from fastapi import FastAPI, File, UploadFile,Request,HTTPException
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import JSONResponse
+from datetime import datetime
+
 import cv2
 import numpy as np
 import aiohttp 
@@ -77,7 +79,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "txid": str(txid) }],  # Ensure txid is not None
+        metadatas=[{"name": name, "deploytxid":str(txid),"facematchcount":0,"currenttxid": str(txid) }],  # Ensure txid is not None
         ids=[id_str]
     )
 
@@ -108,28 +110,41 @@ async def get_name(file: UploadFile = File(...)):
             query_embeddings=[image_vector.tolist()],
             n_results=1
         )
+        current_datetime = datetime.now()
+        current_date_string = current_datetime.strftime("%Y-%m-%d")
 
         res = {
             "name": "Not Found",
             "hexImage": "null",
-            "id": "null"
+            "id": "null",
+            "count":"null",
+            "txid":"null",
+            
+            
         }
         print(result['distances'][0][0])
         if result['distances'][0][0] <= 0.1:
-            # Assuming you have the latestTxid
-            # new_metadata = {"currentMatchCount": 1, "txid": "latestTxid"}
-
-            # # Update the collection with the new metadata using `$push`
-            # collection.update(
-            #     {"_id": result['ids'][0][0]},
-            #     {"$push": {"metadatas": new_metadata}}
-            # )
-
             # Update response dictionary after successful update
+            lasttxid=result['metadatas'][0][0]['currenttxid']
+            newfacematchcount=result['metadatas'][0][0]['facematchcount']+1
+            messageToBeBroadcastAfterUnlockingNft = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person on dated {current_date_string}. Nft-identity, deployTxid: {result['metadatas'][0][0]['deploytxid']} and number of times it has appeared is: {newfacematchcount} ,face"
+            latestTxid = await call_facematch_endpoint(lastTxid, 0, messageToBeBroadcastAfterUnlockingNft)
             res["name"] = result['metadatas'][0][0]['name']
             res["hexImage"] = result['documents'][0][0]
+            res["txid"]=latestTxid
+            res["count"]=newfacematchcount
             res["id"] = result['ids'][0][0]
+            old_metdata=result
+            new_metadata=res
+            result["metadatas"][0][0]["currenttxid"]=latestTxid
+            result["metadatas"][0][0]["facematchcount"]=newfacematchcount
+            collection.update(
+            ids=[res["id"]],
+            metadatas=[result["metadatas"][0][0]],)
+            
+        
 
+        
         return res
     except Exception as e:
         # Log the error for debugging

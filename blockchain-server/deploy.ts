@@ -1,141 +1,66 @@
+import { TestWallet, toByteString, sha256, Addr } from 'scrypt-ts'
+import { myAddress, myPrivateKey } from './tests/utils/privateKey'
+import { HashLockFT } from './src/contracts/hashLockFT'
 import {
-    PubKey,
-    toHex,
-    toByteString,
-    DefaultProvider,
-    bsv,
-    findSig,
-    MethodCallOptions,
-    buildPublicKeyHashScript,
-    hash160,
-} from 'scrypt-ts'
-import { Article } from './src/contracts/Article'
-import { getDefaultSigner, sleep } from './tests/utils/txHelper'
-import { myPublicKey, myAddress } from './tests/utils/privateKey'
+    BSV20V1P2PKH,
+    OrdiProvider,
+    OrdiMethodCallOptions,
+} from 'scrypt-ord'
+import { getDefaultSigner } from './tests/utils/txHelper'
 
-async function main() {
-    // const commentMap = new HashedMap<bigint, ByteString>()
-    await Article.loadArtifact('./artifacts/Article.json')
-
-    const text = 'hello xiahoui'
-
-    const instance = new Article(
-        5n,
-        5n,
-        toByteString('shubham', true),
-        toByteString('shubham', true),
-        toByteString('shubham', true),
-        toByteString('shubham', true),
-        toByteString('shubham', true),
-        toByteString('shubham', true),
-        PubKey(toHex(myPublicKey)),
-        0n,
-        0n
-    )
-
-    await instance.connect(getDefaultSigner())
-
-    const inscriptiontx = await instance.inscribeText(text)
-    // console.log(inscriptiontx.toString())
-
-    // console.log('inscriptiontx id', inscriptiontx.)
-
-    const provider = new DefaultProvider({
-        network: bsv.Networks.testnet,
-    })
-
-    await provider.connect()
-
-    const txl: bsv.Transaction = inscriptiontx
-    const txstring=txl.toString()
-    const tx=new bsv.Transaction(
-        txstring
-        )
-
-    const meInstance = Article.fromUTXO({
-        txId: tx.id,
-        outputIndex: 0,
-        script: tx.outputs[0].script.toHex(),
-        satoshis: 1,
-    })
-    await meInstance.connect(getDefaultSigner())
-    const meLikeInstance = meInstance.next()
-    meLikeInstance.likecount = meLikeInstance.likecount + BigInt(1)
-    const sc = meLikeInstance.lockingScript
-
-    meInstance.bindTxBuilder('like', async function () {
-        const unsignedTx: bsv.Transaction = new bsv.Transaction().addInput(
-            meInstance.buildContractInput()
-        )
-
-        unsignedTx
-            .addOutput(
-                new bsv.Transaction.Output({
-                    script: sc,
-                    satoshis: 1,
-                })
-            )
-
-            .addOutput(
-                new bsv.Transaction.Output({
-                    script: buildPublicKeyHashScript(
-                        hash160(myPublicKey.toString())
-                    ),
-                    satoshis: 10,
-                })
-            )
-
-            .change(myAddress)
-        return Promise.resolve({
-            tx: unsignedTx,
-            atInputIndex: 0,
-            nexts: [],
-        })
-    })
-
-    const { tx: likeTx } = await meInstance.methods.like(
-        (sigResps) => findSig(sigResps, myPublicKey),
-        PubKey(toHex(myPublicKey)),
-        10n,
-        meInstance.authorPubKey,
-        {
-            // sign with the private key corresponding to `myPublicKey` (which is `myPrivateKey` in the signer)
-            // since I am the issuer at the beginning
-            pubKeyOrAddrToSign: myPublicKey,
-
-            transfer: meLikeInstance,
-        } as MethodCallOptions<Article>
-    )
-    console.log('Recallable of asset token called: ' + likeTx.id)
-
-    sleep(3)
-
-    // const tx2 = await provider.getTransaction(likeTx.id)
-
-    // const meInstance1 = Article.fromUTXO({
-    //     txId: likeTx.id,
-    //     outputIndex: 0,
-    //     script: tx2.outputs[0].script.toHex(),
-    //     satoshis: 1,
-    // })
-
-    // const latestInstance = meInstance1
-
-    // const likecount = latestInstance.likecount
-    // const sharecount = latestInstance.sharecount
-    // console.log('likecount:', likecount)
-    // console.log('sharecount', sharecount)
+/**
+ * @returns mainnet signer
+ */
+function getSigner() {
+    return new TestWallet(myPrivateKey, new OrdiProvider())
 }
 
-// async function like() {
+async function main() {
+    HashLockFT.loadArtifact('./artifacts/hashLockFT.json')
 
-//     await Article.loadArtifact('./artifacts/Article.json')
+    // BSV20 fields
+    const tick = toByteString('HELLO', true)
+    const max = 21000000n
+    const lim = 1337n
+    const dec = 0n
 
-// }
+    // create contract instance
+    const message = toByteString('Hello sCrypt', true)
+    const hash = sha256(message)
+    const hashLock = new HashLockFT(message, max, lim, dec, hash)
+    
+    await hashLock.connect(getDefaultSigner())
 
-main().catch(console.error)
+    // deploy the new BSV20 token $HELLO
+    // await hashLock.deployToken()
+    // mint 10 $HELLO into contract instance
+    const mintTx = await hashLock.mint(10n)
+    console.log(`Mint tx: ${mintTx.id}`)
 
-//  transfer: {
-//     instance: nextInstance,
-//     amt: transferAmount,
-// // },
+    console.log(hashLock.getInscription())
+
+    // for now, the contract instance holds the BSV20 token
+    // this token can be transferred only when the hash lock is solved
+    const addressAlice = Addr(myAddress.toByteString())
+    const alice = new BSV20V1P2PKH(tick, max, lim, dec, addressAlice)
+    
+    const addressBob = Addr(myAddress.toByteString())
+    const bob = new BSV20V1P2PKH(tick, max, lim, dec, addressBob)
+
+
+    const { tx: transferTx } = await hashLock.methods.unlock(message, {
+        transfer: [
+            {
+                instance: alice,
+                amt: 2n,
+            },
+            {
+                instance: bob,
+                amt: 5n,
+            },
+        ],
+    } as OrdiMethodCallOptions<HashLockFT>)
+    console.log(`Transfer tx: ${transferTx.id}`)
+}
+
+main()

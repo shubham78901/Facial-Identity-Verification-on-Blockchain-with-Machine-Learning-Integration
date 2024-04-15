@@ -19,7 +19,10 @@ router.post('/facematch', async function (req: Request, res: Response) {
 
         console.log(`Like successful. Transaction ID: ${result}`)
 
-        res.json({ success: true, result })
+        res.json({
+            success: true,
+            result: { result},
+        })
     } catch (error) {
         console.error('Error liking article:', error)
         res.status(500).json({ success: false, error: 'Internal Server Error' })

@@ -24,6 +24,9 @@ export class MachineLearningNft extends OrdinalNFT {
     @prop(true)
     faceMatchResult: ByteString
 
+    @prop(true)
+    faceMatchCount: bigint
+
   
 
     
@@ -33,6 +36,7 @@ export class MachineLearningNft extends OrdinalNFT {
         nftHolderName: ByteString,
         vectorOfCosine: ByteString,
         faceMatchResult: ByteString,
+        faceMatchCount:bigint,
        
     ) {
         
@@ -41,6 +45,7 @@ export class MachineLearningNft extends OrdinalNFT {
         this.nftHolderName=nftHolderName
         this.vectorOfCosine=vectorOfCosine
         this.faceMatchResult=faceMatchResult
+        this.faceMatchCount=faceMatchCount
 
 
         
@@ -59,6 +64,7 @@ export class MachineLearningNft extends OrdinalNFT {
             "User's signature check failed"
         )
      this.faceMatchResult=faceMatchResult
+     this.faceMatchCount= this.faceMatchCount+BigInt(1)
         let outputs = this.buildStateOutputNFT()
      
         outputs += this.buildChangeOutput()

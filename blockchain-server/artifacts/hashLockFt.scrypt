@@ -1,0 +1,45 @@
+import "node_modules/scrypt-ord/src/contracts/ordinal.scrypt";
+
+contract HashLockFT {
+  @state bool isBSV20V1;
+  const bytes tick;
+  const int max;
+  const int lim;
+  const int dec;
+  Sha256 hash;
+  constructor(bytes tick, int max, int lim, int dec, Sha256 hash) {
+    this.tick = tick;
+    this.max = max;
+    this.lim = lim;
+    this.dec = dec;
+    this.isBSV20V1 = true;
+    require(this.max <= 18446744073709551615);
+    require(this.dec <= 18);
+    
+    this.hash = hash;
+  }
+  function buildStateOutputFT(int amt) : bytes {
+    bytes stateScript = HashLockFT.createTransferInsciption(this.tick, amt) + Ordinal.removeInsciption(this.getStateScript());
+    return Utils.buildOutput(stateScript, 1);
+  }
+  static function buildTransferOutput(Ripemd160 address, bytes tick, int amt) : bytes {
+    bytes transferScript = HashLockFT.buildTransferScript(address, tick, amt);
+    return Utils.buildOutput(transferScript, 1);
+  }
+  static function buildTransferScript(Ripemd160 address, bytes tick, int amt) : bytes {
+    return (HashLockFT.createTransferInsciption(tick, amt) + Utils.buildPublicKeyHashScript(address));
+  }
+  static function createMintInsciption(bytes tick, int amt) : bytes {
+    bytes amtByteString = Ordinal.int2Str(amt);
+    bytes mintJSON = "{\"p\":\"bsv-20\",\"op\":\"mint\",\"tick\":\"" + tick + "\",\"amt\":\"" + amtByteString + "\"}";
+    return Ordinal.createInsciption(mintJSON, "application/bsv-20");
+  }
+  static function createTransferInsciption(bytes tick, int amt) : bytes {
+    bytes amtByteString = Ordinal.int2Str(amt);
+    bytes transferJSON = "{\"p\":\"bsv-20\",\"op\":\"transfer\",\"tick\":\"" + tick + "\",\"amt\":\"" + amtByteString + "\"}";
+    return Ordinal.createInsciption(transferJSON, "application/bsv-20");
+  }
+  public function unlock(bytes message) {
+    require(this.hash == sha256(message));
+  }
+}

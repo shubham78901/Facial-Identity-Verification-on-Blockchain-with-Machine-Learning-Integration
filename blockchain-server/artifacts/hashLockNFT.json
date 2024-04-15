@@ -1,0 +1,54 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.2+commit.c3a20a0",
+    "contract": "HashLockNFT",
+    "md5": "469637948c9f1a7791360541e9e87149",
+    "structs": [],
+    "library": [
+        {
+            "name": "Ordinal",
+            "params": [],
+            "properties": [],
+            "genericTypes": []
+        },
+        {
+            "name": "Shift10",
+            "params": [],
+            "properties": [],
+            "genericTypes": []
+        }
+    ],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": [
+                {
+                    "name": "message",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "type": "constructor",
+            "params": [
+                {
+                    "name": "hash",
+                    "type": "Sha256"
+                }
+            ]
+        }
+    ],
+    "stateProps": [
+        {
+            "name": "isOneSatNFT",
+            "type": "bool"
+        }
+    ],
+    "buildType": "debug",
+    "file": "file:///D:/Desktop/machine-learning-nft/blockchain-server/artifacts/hashLockNFT.scrypt",
+    "hex": "000000<hash>6151547a75537a537a537a0079537a75527a527a756151795479a88777777777",
+    "sourceMapFile": ""
+}

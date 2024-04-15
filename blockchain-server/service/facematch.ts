@@ -46,7 +46,8 @@ export async function facematch(
 
     const sc = meLikeInstance.lockingScript 
     
-    meLikeInstance.faceMatchResult=   toByteString(currentMessage,true)
+    meLikeInstance.faceMatchResult= toByteString(currentMessage,true)
+    meLikeInstance.faceMatchCount=meLikeInstance.faceMatchCount+BigInt(1)
     latestInstance.bindTxBuilder('registerResultAfterFaceMatch', async function () {
         const unsignedTx: bsv.Transaction = new bsv.Transaction().addInput(
             meInstance.buildContractInput()

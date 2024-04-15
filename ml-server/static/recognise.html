@@ -101,7 +101,10 @@
     <h1>Camera Photo Upload</h1>
 
     <div id="response">
+     <p id="youappeared"></p>
         <p id="name"></p>
+           <p id="Txid"></p>
+            <p id="viewonwoc"></p>
         <p id="id"></p>
         <div id="imageContainer"></div>
     </div>
@@ -115,6 +118,9 @@
         const nameElement = document.getElementById('name');
         const idElement = document.getElementById('id');
         const imageContainer = document.getElementById('imageContainer');
+        const viewonwocContainer=document.getElementById('viewonwoc');
+       const txidcontainer= document.getElementById('Txid');
+      const youappearedContainer= document.getElementById('youappeared');
 
         // Start the video stream when the page loads
         window.addEventListener('load', async () => {
@@ -155,6 +161,10 @@
                 // Display the name and ID
                 nameElement.textContent = `Name: ${data.name}`;
                 idElement.textContent = `ID: ${data.id}`;
+                youappearedContainer.textContent=`You appeared ${data.count} times`;
+                txidcontainer.textContent=`Txid: ${data.txid}`;
+                viewonwocContainer.textContent=`<a href="https://test.whatsonchain.com/tx/${data.txid}" target="_blank">View on Whatsonchain</a>`
+
 
                 if (data.hexImage !== "null") {
                     convertAndDisplay(data.hexImage);

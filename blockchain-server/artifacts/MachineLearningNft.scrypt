@@ -6,13 +6,15 @@ contract MachineLearningNft {
   bytes nftHolderName;
   bytes vectorOfCosine;
   @state bytes faceMatchResult;
+  @state int faceMatchCount;
   __scrypt_ts_Change __scrypt_ts_change;
-  constructor(bytes nftHolderName, bytes vectorOfCosine, bytes faceMatchResult) {
+  constructor(bytes nftHolderName, bytes vectorOfCosine, bytes faceMatchResult, int faceMatchCount) {
     this.isOneSatNFT = true;
     
     this.nftHolderName = nftHolderName;
     this.vectorOfCosine = vectorOfCosine;
     this.faceMatchResult = faceMatchResult;
+    this.faceMatchCount = faceMatchCount;
   }
   function buildStateOutputNFT() : bytes {
     bytes stateScript = Ordinal.removeInsciption(this.getStateScript());
@@ -28,6 +30,7 @@ contract MachineLearningNft {
     this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
     require(checkSig(ownerSig, ownerPubKey));
     this.faceMatchResult = faceMatchResult;
+    this.faceMatchCount = this.faceMatchCount + (1);
     bytes outputs = this.buildStateOutputNFT();
     outputs += this.buildChangeOutput();
     
