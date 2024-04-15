@@ -44,6 +44,8 @@ async def root():
 
 
 
+from fastapi import HTTPException
+
 @app.post("/storeImage")
 async def store_image(request: Request, file: UploadFile = File(...)):
     # Read the uploaded image
@@ -66,6 +68,10 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     # Get transaction ID after minting NFT
     txid = await getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, filetype)
 
+    # Check if txid is empty
+    if not txid:
+        raise HTTPException(status_code=400, detail="Transaction ID is empty")
+
     # Preprocess the image
     # transformed_image = preprocess_image(image)
     transformed_image = image
@@ -81,16 +87,15 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     collection.add(
         documents=[hex_string],
         embeddings=[image_vector.tolist()],
-        metadatas=[{"name": name, "deploytxid": str(txid),"currenttxid":str(txid),"facematchcount":0}],  # Ensure txid is not None
+        metadatas=[{"name": name, "deploytxid": str(txid),"currenttxid":str(txid),"facematchcount":0}],
         ids=[id_str]
     )
-
-
 
     # Return the response with relevant data
     response_data = {"result": "Success!", "txid": str(txid)}
     print("response_data",response_data)
     return JSONResponse(content=response_data)
+
 
 @app.post("/getName")
 async def get_name(file: UploadFile = File(...)):
