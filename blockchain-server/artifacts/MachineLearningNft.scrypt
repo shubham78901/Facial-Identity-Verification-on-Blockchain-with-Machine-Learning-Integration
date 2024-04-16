@@ -25,12 +25,13 @@ contract MachineLearningNft {
     bytes part2 = Ordinal.removeInsciption(script);
     return Utils.buildOutput(part1 + part2, 1);
   }
-  public function registerResultAfterFaceMatch(Sig ownerSig, bytes faceMatchResult, PubKey ownerPubKey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+  public function registerResultAfterFaceMatch(Sig ownerSig, bytes faceMatchResult, PubKey ownerPubKey, int faceMatchCount, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
     this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
     require(checkSig(ownerSig, ownerPubKey));
     this.faceMatchResult = faceMatchResult;
     this.faceMatchCount = this.faceMatchCount + (1);
+    require(this.faceMatchCount == faceMatchCount);
     bytes outputs = this.buildStateOutputNFT();
     outputs += this.buildChangeOutput();
     

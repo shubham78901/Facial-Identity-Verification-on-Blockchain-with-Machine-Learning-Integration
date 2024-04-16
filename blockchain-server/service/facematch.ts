@@ -19,6 +19,7 @@ export async function facematch(
     txid: string,
     outputindex: number,
     currentMessage:string,
+    currentFaceMatchcount:number,
 ): Promise<string> {
     console.log(currentMessage)
     await MachineLearningNft.loadArtifact('./artifacts/MachineLearningNft.json')
@@ -78,7 +79,7 @@ export async function facematch(
       
 
         const { tx: likeTx } = await meInstance.methods.registerResultAfterFaceMatch(
-            (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),
+            (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),currentFaceMatchcount,
             PubKey(toHex(myPublicKey)),
             {
                 // sign with the private key corresponding to `myPublicKey` (which is `myPrivateKey` in the signer)

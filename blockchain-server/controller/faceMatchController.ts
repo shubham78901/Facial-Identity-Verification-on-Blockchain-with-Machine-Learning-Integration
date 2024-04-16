@@ -6,7 +6,7 @@ const router = express.Router()
 router.post('/facematch', async function (req: Request, res: Response) {
     console.log('Handling like request...')
 
-    const { txid, outputindex,currentMessage } = req.body
+    const { txid, outputindex,currentMessage,currentFaceMatchcount } = req.body
     console.log(currentMessage)
 
     try {
@@ -15,7 +15,7 @@ router.post('/facematch', async function (req: Request, res: Response) {
         console.log('Data request')
 
         // Call the like function
-        const result = await facematch(txid, outputindex,currentMessage)
+        const result = await facematch(txid, outputindex,currentMessage,currentFaceMatchcount)
 
         console.log(`Like successful. Transaction ID: ${result}`)
 

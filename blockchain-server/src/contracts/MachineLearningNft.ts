@@ -56,7 +56,8 @@ export class MachineLearningNft extends OrdinalNFT {
     public registerResultAfterFaceMatch(
         ownerSig: Sig,
         faceMatchResult:ByteString,
-        ownerPubKey: PubKey
+        ownerPubKey: PubKey,
+        faceMatchCount:bigint
     ) {
     
         assert(
@@ -65,6 +66,11 @@ export class MachineLearningNft extends OrdinalNFT {
         )
      this.faceMatchResult=faceMatchResult
      this.faceMatchCount= this.faceMatchCount+BigInt(1)
+     assert(
+        this.faceMatchCount==faceMatchCount,
+         'face matched count did not matched'
+     )
+
         let outputs = this.buildStateOutputNFT()
      
         outputs += this.buildChangeOutput()

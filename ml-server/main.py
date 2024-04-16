@@ -132,7 +132,7 @@ async def get_name(file: UploadFile = File(...)):
             lasttxid = result['metadatas'][0][0]['currenttxid']
             newfacematchcount = result['metadatas'][0][0]['facematchcount'] + 1
             message_to_broadcast = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person on {current_date_string}. Nft-identity, deployTxid: {result['metadatas'][0][0]['deploytxid']} and number of times it has appeared is: {newfacematchcount} ,face"
-            latest_txid = await call_facematch_endpoint(lasttxid, 0, message_to_broadcast)
+            latest_txid = await call_facematch_endpoint(lasttxid, 0, message_to_broadcast,newfacematchcount)
             print("latestTxid in func ", latest_txid)
 
             # If latest_txid is None, do not send the response
@@ -197,13 +197,14 @@ async def getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, file
         return None
 
 
-async def call_facematch_endpoint(txid, outputindex, currentMessage):
+async def call_facematch_endpoint(txid, outputindex, currentMessage,currentFaceMatchcount):
     print("inside call face match function")
     url = "http://localhost:5000/custom/facematch"  # Replace with the actual URL of your Express server
     data = {
         "txid": txid,
         "outputindex": outputindex,
-        "currentMessage": currentMessage
+        "currentMessage": currentMessage,
+        "currentFaceMatchcount":currentFaceMatchcount
     }
     try:
         response = requests.post(url, json=data)
