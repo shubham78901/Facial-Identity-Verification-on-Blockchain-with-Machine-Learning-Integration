@@ -57,19 +57,17 @@ export class MachineLearningNft extends OrdinalNFT {
         ownerSig: Sig,
         faceMatchResult:ByteString,
         ownerPubKey: PubKey,
-        faceMatchCount:bigint
+ 
+ 
     ) {
     
         assert(
             this.checkSig(ownerSig, ownerPubKey),
             "User's signature check failed"
         )
+        this.increment()
      this.faceMatchResult=faceMatchResult
-     this.faceMatchCount= this.faceMatchCount+BigInt(1)
-     assert(
-        this.faceMatchCount==faceMatchCount,
-         'face matched count did not matched'
-     )
+
 
         let outputs = this.buildStateOutputNFT()
      
@@ -81,5 +79,8 @@ export class MachineLearningNft extends OrdinalNFT {
             'hashOutputs check failed'
         )
     }
-
+    @method()
+    increment(): void {
+        this.faceMatchCount++
+    }
 }

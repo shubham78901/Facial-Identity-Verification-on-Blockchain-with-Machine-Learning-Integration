@@ -27,7 +27,7 @@ export async function facematch(
         network: bsv.Networks.testnet,
     })
     await provider.connect()
-   
+   console.log(currentFaceMatchcount)
 
     const  tx = await provider.getTransaction(txid)
 
@@ -45,11 +45,12 @@ export async function facematch(
     await meInstance.connect(getDefaultSigner())
 
     const meLikeInstance = meInstance.next()
-
+meLikeInstance.faceMatchCount++
     const sc = meLikeInstance.lockingScript 
+meLikeInstance.increment()
     
     meLikeInstance.faceMatchResult= toByteString(currentMessage,true)
-    meLikeInstance.faceMatchCount=meLikeInstance.faceMatchCount+BigInt(1)
+   
     meInstance.bindTxBuilder('registerResultAfterFaceMatch', async function () {
         const unsignedTx: bsv.Transaction = new bsv.Transaction().addInput(
             meInstance.buildContractInput()
@@ -80,9 +81,9 @@ export async function facematch(
 
         const { tx: likeTx } = await meInstance.methods.registerResultAfterFaceMatch(
             (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),
-            PubKey(toHex(myPublicKey)),currentFaceMatchcount,
+            PubKey(toHex(myPublicKey)),
             {
-                // sign with the private key corresponding to `myPublicKey` (which is `myPrivateKey` in the signer)
+                // sign with the private key corresponding to `myPublicKey` (swhich is `myPrivateKey` in the signer)
                 // since I am the issuer at the beginning
                 pubKeyOrAddrToSign: myPublicKey,
 
