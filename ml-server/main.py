@@ -96,7 +96,6 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     print("response_data",response_data)
     return JSONResponse(content=response_data)
 
-
 @app.post("/getName")
 async def get_name(file: UploadFile = File(...)):
     try:
@@ -125,36 +124,35 @@ async def get_name(file: UploadFile = File(...)):
             "name": "Not Found",
             "hexImage": "null",
             "id": "null",
-            "count":"null",
-            "txid":"null",
-            
-            
+            "count": "null",
+            "txid": "null",
         }
-        print(result['distances'][0][0])
-        if result['distances'][0][0] <= 0.1:
-            # Update response dictionary after successful update
-            lasttxid=result['metadatas'][0][0]['currenttxid']
-            newfacematchcount=result['metadatas'][0][0]['facematchcount']+1
-            messageToBeBroadcastAfterUnlockingNft = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person on dated {current_date_string}. Nft-identity, deployTxid: {result['metadatas'][0][0]['deploytxid']} and number of times it has appeared is: {newfacematchcount} ,face"
-            latestTxid = await call_facematch_endpoint(lasttxid, 0, messageToBeBroadcastAfterUnlockingNft)
-            print("latestTxid in func ",latestTxid)
-            res["name"] = result['metadatas'][0][0]['name']
-            res["hexImage"] = result['documents'][0][0]
-            res["txid"]=latestTxid
-            res["count"]=newfacematchcount
-            res["id"] = result['ids'][0][0]
-            old_metdata=result
-            new_metadata=res
-            result["metadatas"][0][0]["currenttxid"]=latestTxid
-            result["metadatas"][0][0]["facematchcount"]=newfacematchcount
-            collection.update(
-            ids=[res["id"]],
-            metadatas=[result["metadatas"][0][0]],)
-            
-        
 
-        
+        if result['distances'][0][0] <= 0.1:
+            lasttxid = result['metadatas'][0][0]['currenttxid']
+            newfacematchcount = result['metadatas'][0][0]['facematchcount'] + 1
+            message_to_broadcast = f"Nft-identity unlocked by {result['metadatas'][0][0]['name']} this person on {current_date_string}. Nft-identity, deployTxid: {result['metadatas'][0][0]['deploytxid']} and number of times it has appeared is: {newfacematchcount} ,face"
+            latest_txid = await call_facematch_endpoint(lasttxid, 0, message_to_broadcast)
+            print("latestTxid in func ", latest_txid)
+
+            # If latest_txid is None, do not send the response
+            if latest_txid is not None:
+                res["name"] = result['metadatas'][0][0]['name']
+                res["hexImage"] = result['documents'][0][0]
+                res["txid"] = latest_txid
+                res["count"] = newfacematchcount
+                res["id"] = result['ids'][0][0]
+                result["metadatas"][0][0]["currenttxid"] = latest_txid
+                result["metadatas"][0][0]["facematchcount"] = newfacematchcount
+                collection.update(
+                    ids=[res["id"]],
+                    metadatas=[result["metadatas"][0][0]],
+                )
+            else:
+                return {"message": "Latest transaction ID is None, response not sent."}
+
         return res
+
     except Exception as e:
         # Log the error for debugging
         print(f"Error processing image: {e}")
