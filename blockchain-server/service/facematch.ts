@@ -79,8 +79,8 @@ export async function facematch(
       
 
         const { tx: likeTx } = await meInstance.methods.registerResultAfterFaceMatch(
-            (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),currentFaceMatchcount,
-            PubKey(toHex(myPublicKey)),
+            (sigResps) => findSig(sigResps, myPublicKey),toByteString(currentMessage,true),
+            PubKey(toHex(myPublicKey)),currentFaceMatchcount,
             {
                 // sign with the private key corresponding to `myPublicKey` (which is `myPrivateKey` in the signer)
                 // since I am the issuer at the beginning
