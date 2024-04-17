@@ -42,10 +42,14 @@ export async function Mint(
     
 
     // Get MIME type from file data
-
+    const data = {
+        image: fileData,
+        name: toByteString("")
+        }
+        instance.inscribeText(JSON.stringify(data))
 
     // Inscribe image with file data and MIME type
-    const inscriptionTx = await instance.inscribeImage(fileData, fileType);
+    const inscriptionTx = await  instance.inscribeImage(fileData,fileType)
 
     return inscriptionTx.id;
 }

@@ -136,7 +136,7 @@ async def get_name(file: UploadFile = File(...)):
             print("latestTxid in func ", latest_txid)
 
             # If latest_txid is None, do not send the response
-            if latest_txid is not None:
+            if latest_txid is not None and latest_txid != '':
                 res["name"] = result['metadatas'][0][0]['name']
                 res["hexImage"] = result['documents'][0][0]
                 res["txid"] = latest_txid
@@ -149,7 +149,7 @@ async def get_name(file: UploadFile = File(...)):
                     metadatas=[result["metadatas"][0][0]],
                 )
             else:
-                return {"message": "Latest transaction ID is None, response not sent."}
+                return res
 
         return res
 
