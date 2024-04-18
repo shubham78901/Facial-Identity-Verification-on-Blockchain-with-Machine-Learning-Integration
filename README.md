@@ -21,6 +21,10 @@ Steps to Install:
 cd ml-server
 pip install -r requirements.txt
 
+cmd to run=uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+important library used,faceRecogination,fastapi,dlib
+
 
 2.Blockchain Server
 Contains all APIs of functions of smart contracts.
