@@ -52,7 +52,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     form_data = await request.form()
     name = form_data.get("name")
     nftHolderName = name
-    vectorOfCosine = name
+ 
 
     # Get the transaction ID after minting NFT
     filetype = file.content_type
@@ -64,7 +64,9 @@ async def store_image(request: Request, file: UploadFile = File(...)):
     _, buffer = cv2.imencode('.jpg', image)
     byte_array = buffer.tobytes()
     hex_string = byte_array.hex()
-
+    transformed_image = image
+    print(type(transformed_image))
+    vectorOfCosine =hex_string
     # Get transaction ID after minting NFT
     txid = await getTxidAfterMintingNft(nftHolderName, vectorOfCosine, hex_string, filetype)
 
@@ -74,7 +76,7 @@ async def store_image(request: Request, file: UploadFile = File(...)):
 
     # Preprocess the image
     # transformed_image = preprocess_image(image)
-    transformed_image = image
+
 
     # Encode the image using MobileNetV2
     image_vector = encode_image(transformed_image)
