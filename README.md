@@ -33,6 +33,14 @@ npx-ts-node server.ts
 
 
 
+landing page-
+![image](https://github.com/shubham78901/Facial-Identity-Verification-on-Blockchain-with-Machine-Learning-Integration/assets/70124011/fc2412df-7f5b-4746-acb1-2720f7c412b7)
+
+locking person image-
+![image](https://github.com/shubham78901/Facial-Identity-Verification-on-Blockchain-with-Machine-Learning-Integration/assets/70124011/d987b08a-6602-4a6f-8aa4-68cc8850d3b6)
+
+unlocking and maining state on blockchain-
+![image](https://github.com/shubham78901/Facial-Identity-Verification-on-Blockchain-with-Machine-Learning-Integration/assets/70124011/c6c56310-dee9-464c-afc9-9556dbbdbed9)
 
 
 
