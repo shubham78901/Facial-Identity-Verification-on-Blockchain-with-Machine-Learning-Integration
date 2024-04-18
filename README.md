@@ -6,6 +6,10 @@ Unprecedented Transparency: Inscribing unique faces onto personalized tokens and
 Fraud Detection Reinvented: By tracking the chain of transactions associated with each face image, our system enhances fraud detection capabilities, minimizing the risk of identity theft and misuse.
 Improved Recognition Model Efficiency: Solving ambiguities in recognition models, our platform optimizes the efficiency of facial recognition systems, delivering accurate and reliable results.
 
+
+
+
+
 Installation and Setup Guide
 Server Setup
 There are two servers required to run this project:
@@ -35,6 +39,14 @@ Steps to Run:
 cd blockchain-server
 npm i
 npx-ts-node server.ts
+
+
+
+
+
+
+
+
 
 landing page-
 ![image](https://github.com/shubham78901/Facial-Identity-Verification-on-Blockchain-with-Machine-Learning-Integration/assets/70124011/fc2412df-7f5b-4746-acb1-2720f7c412b7)
