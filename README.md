@@ -14,7 +14,11 @@ Contains all Python and frontend files.
 Tech stack used: Python, HTML, CSS, ChromaDB, Machine Learning models.
 Running on port 8000.
 Provides two APIs:
+
+
 /upload: Allows users to upload a face image with a name.
+
+
 /getname: Unlocks if the current person's face is near to any locked image.
 Steps to Install:
 
@@ -32,7 +36,11 @@ Contains all APIs of functions of smart contracts.
 Contract used: Stateful, Satordinal.
 Running on port 5000.
 Provides two APIs:
+
+
 /mint: Uploads image vector and other information of image NFT to the chain.
+
+
 /facematch: Gets triggered when /getname API of ML server is called, increases face match count on blockchain with necessary assertion.
 Steps to Run:
 
