@@ -23,6 +23,7 @@ Provides two APIs:
 Steps to Install:
 
 cd ml-server
+
 pip install -r requirements.txt
 
 cmd to run
@@ -41,11 +42,16 @@ Provides two APIs:
 /mint: Uploads image vector and other information of image NFT to the chain.
 
 
-/facematch: Gets triggered when /getname API of ML server is called, increases face match count on blockchain with necessary assertion.
+/facematch: Gets triggered when 
+
+/getname API of ML server is called, increases face match count on blockchain with necessary assertion.
+
 Steps to Run:
 
 cd blockchain-server
+
 npm i
+
 npx-ts-node server.ts
 
 
