@@ -1,4 +1,6 @@
 Facial Identity Verification on Blockchain
+
+
 deployed link= https://bbdb-13-202-14-28.ngrok-free.app/
 
 Welcome to our groundbreaking platform, where cutting-edge technology meets the simplicity of facial recognition. Imagine a world where your face becomes your secure key, tracked through blockchain. We're revolutionizing identity verification by combining advanced machine learning with blockchain capabilities. Say goodbye to recognition ambiguity and hello to enhanced fraud detection and streamlined facial recognition—all with the click of a button. With every transaction recorded on the blockchain, your facial identity's journey is transparent and secure.
@@ -21,6 +23,9 @@ Provides two APIs:
 
 /getname: Unlocks if the current person's face is near to any locked image.
 
+......
+
+....
 
 Steps to Install:
 
@@ -33,13 +38,17 @@ cmd to run
 
 important library used=faceRecogination,fastapi,dlib
 
+.....
+
+.....
 
 2.Blockchain Server
 Contains all APIs of functions of smart contracts.
 Contract used: Stateful, Satordinal.
 Running on port 5000.
 Provides two APIs:
-
+..
+..
 
 /mint: Uploads image vector and other information of image NFT to the chain.
 
@@ -47,6 +56,9 @@ Provides two APIs:
 /facematch: Gets triggered when 
 
 /getname API of ML server is called, increases face match count on blockchain with necessary assertion.
+
+...
+...
 
 Steps to Run:
 
