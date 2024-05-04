@@ -1,7 +1,7 @@
 Facial Identity Verification on Blockchain
 
 
-deployed link= https://bbdb-13-202-14-28.ngrok-free.app/
+deployed link= https://95dc-13-202-14-28.ngrok-free.app/
 
 Welcome to our groundbreaking platform, where cutting-edge technology meets the simplicity of facial recognition. Imagine a world where your face becomes your secure key, tracked through blockchain. We're revolutionizing identity verification by combining advanced machine learning with blockchain capabilities. Say goodbye to recognition ambiguity and hello to enhanced fraud detection and streamlined facial recognition—all with the click of a button. With every transaction recorded on the blockchain, your facial identity's journey is transparent and secure.
 
